@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.util.StringTokenizer;
 
 public class Main {
-	private static String[] coupleList;
+	private static boolean[][] coupleList;
+	private static boolean[] coupleListCheck;
 	private static boolean[] personList;
 
 	public static void main(String[] args) throws IOException {
@@ -18,11 +19,15 @@ public class Main {
 			StringTokenizer st = new StringTokenizer(br.readLine());
 			int personNum = Integer.parseInt(st.nextToken());
 			int coupleNum = Integer.parseInt(st.nextToken());
-			coupleList = new String[coupleNum];
+			coupleList = new boolean[personNum][personNum];
+			coupleListCheck = new boolean[coupleNum];
 			
 			st = new StringTokenizer(br.readLine());
-			for (int j = 0; j < coupleNum; j++) {
-				coupleList[j] = st.nextToken() + " " + st.nextToken();
+			for (int j = 0; j < coupleNum; j += 2) {
+//				coupleList[j] = st.nextToken() + " " + st.nextToken();
+				int num1 = Integer.parseInt(st.nextToken());
+				int num2 = Integer.parseInt(st.nextToken());
+				coupleList[num1][num2] = coupleList[num2][num1] = true;
 			}
 			
 			personList = new boolean[personNum];
@@ -38,18 +43,16 @@ public class Main {
 		}
 		
 		int personNum = personList.length;
-		for (int person1 = 0; person1 < personNum; person1++) {
-			if(personList[person1]) continue;
-			
-			for (int person2 = 0; person2 < personNum; person2++) {
-				if(person1 != person2) continue;
-				if(personList[person2]) continue;
-				
-				if(canCouple(person1, person2)) {
-					personList[person1] = personList[person2] = true;
-					matchCount = matchCouple(matchCount);
-					personList[person1] = personList[person2] = false;
-				}
+		int person1 = 0;
+		for (person1 = 0; person1 < personNum; person1++) {
+			if(!personList[person1]) break;
+		}
+
+		for (int person2 = person1 + 1; person2 < personNum; person2++) {
+			if(!personList[person2] && coupleList[person1][person2]) {
+				personList[person1] = personList[person2] = true;
+				matchCount = matchCouple(matchCount);
+				personList[person1] = personList[person2] = false;
 			}
 		}
 		
@@ -64,16 +67,4 @@ public class Main {
 		}
 		return true;
 	}
-	
-	private static boolean canCouple(int person1, int person2) {
-		if(person1 > person2) return false;
-		
-		for(String couple : coupleList) {
-			if(couple.contains(person1 + "") && couple.contains(person2 + "")) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 }
